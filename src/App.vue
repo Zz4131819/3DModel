@@ -63,11 +63,9 @@ const gltfloading = (mesh,camera,renderer) =>{
     const targetSize = 2; // 设置模型期望的大小
     const scale = targetSize / maxSize;
     model.scale.set(scale, scale, scale);
-    // 将模型放置到屏幕中心
-    model.position.set(10,10,-10);
     // 添加模型到场景中
     scene.add(model);
-    scene.add(new THREE.AmbientLight(0xffffff, 1))
+    scene.add(new THREE.AmbientLight(0xffffff, 5))
     // 鼠标操作旋转、缩放
     new OrbitControls(camera, renderer.domElement);
     // 创建动画混合器
@@ -99,6 +97,9 @@ onMounted(()=>{
   camera.position.set(0,0,10); // 设置相机位置
   camera.lookAt(new THREE.Vector3(0, 0, 0));
   gltfloading(mesh,camera,renderer)
+  // const directionalLight = new THREE.DirectionalLight(0xffffff, 10); // 第一个参数是光的颜色，第二个参数是光的强度
+  // directionalLight.position.set(0,0,10).normalize();
+  // scene.add(directionalLight);
   // const textureLoader = new THREE.TextureLoader();
   // // 加载背景图片
   // const texture = textureLoader.load(bg);
