@@ -5,11 +5,21 @@
     <div class="carousel">
         <el-carousel :autoplay="false" :interval="4000" type="card" height="150px" @change="carouselChange">
             <el-carousel-item v-for="item in data.imges" :key="item" style="background-color: azure;">
-                <img :src="item.url" style="width: 300px;height: 150px;">
+                <!-- <img :src="item.url" style="width: 300px;height: 150px;"> -->
+                <el-image
+                    style="width: 300px; height: 150px"
+                    :src="item.url"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
+                    :preview-src-list="data.imges"
+                    :initial-index="4"
+                    fit="cover"
+                />
+                <!-- <button @click="screenshot">downloading</button> -->
             </el-carousel-item>
         </el-carousel>
     </div>
-    
 </template>
 <script setup>
 import * as THREE from 'three';
@@ -19,6 +29,18 @@ import { onMounted, reactive } from 'vue';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { getImgesList } from '../api/index'
 import { ref } from 'vue'
+import { ElLoading } from 'element-plus';
+const loadingInstance = ref()
+const showLoading = () => {
+    loadingInstance.value = ElLoading.service({
+        text: '加载中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
+};
+const hideLoading = () => {
+    loadingInstance.value.close();
+};
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
@@ -94,6 +116,7 @@ const gltfloading = (mesh) =>{
 }
 
 const sphericalGeometry = (url) =>{
+    showLoading()
     // 鼠标操作旋转、缩放
     const controls = new OrbitControls(camera.value, renderer.value.domElement);
     controls.enableZoom = false;
@@ -109,6 +132,7 @@ const sphericalGeometry = (url) =>{
     const sphere = new THREE.Mesh(geometry, material);
     scene.add(sphere);
     animateFunction(0)
+    hideLoading()
 }
 
 const traversal = (mixer,gltf) =>{
@@ -117,6 +141,21 @@ const traversal = (mixer,gltf) =>{
         action.reset().play();
         actions.push(action);
     });
+}
+
+const screenshot = (name) =>{
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const currentTime = `${hours}:${minutes}:${seconds}`;
+    const img = renderer.value.domElement.toDataURL('image/jpg')
+    const a = document.createElement('a');
+    a.href = img;
+    a.download = `${currentTime}-${name}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 
 // 动画循环
@@ -135,13 +174,16 @@ const carouselChange = (val) => {
     sphericalGeometry(data.imges[val].url)
 }
 
-function convertVRToBase64(url) {
+function convertVRToBase64() {
     const temporaryScene = new THREE.Scene();
     const temporaryCamera = new THREE.PerspectiveCamera(75, 800 / 600, 0.1, 1000)
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer:true });
+    // 创建一个环境光
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 光颜色为白色，光强度为0.5
+    temporaryScene.add(ambientLight);
     renderer.setSize(200, 150);
     renderer.render(temporaryScene, temporaryCamera);
-    const dataUrl = renderer.domElement.toDataURL(url);
+    const dataUrl = renderer.domElement.toDataURL('image/jpg');
     return dataUrl;
 }
 const data = reactive({
@@ -164,17 +206,14 @@ const canvas = ref()
 const renderer = ref()
 const camera = ref()
 onMounted(()=>{
-    //获取画布元素
     canvas.value = document.querySelector("canvas.web3d");
-    renderer.value = new THREE.WebGLRenderer({ canvas: canvas.value });
+    renderer.value = new THREE.WebGLRenderer({ canvas: canvas.value ,preserveDrawingBuffer:true});
     renderer.value.setSize(sizes.width, sizes.height)
     renderer.value.setClearColor(0xffffff,0);
-    // 添加相机
     camera.value = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
     camera.value.position.set(10,10,10); // 设置相机位置
     camera.value.lookAt(new THREE.Vector3(0, 0, 0));
     getImgesListData()
-
     // gltfloading(mesh,camera,renderer)
     // 在计算属性中使用 data.imges[0] 来确保异步数据已经加载完毕
 })

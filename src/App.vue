@@ -1,35 +1,22 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/vr">About</router-link>
-  </nav>
-  <div class="box">
-    <router-view/>
+  <div>
+      <RouterView/>
   </div>
 </template>
+<script lang="ts">
+import { defineComponent } from 'vue'
+import RouterView from './components/routerView.vue'
+export default defineComponent({
+  components:{RouterView},
+  setup() {
+    
+  },
+})
+</script>
+
 <style>
-
-nav {
-  position: absolute;
-  top: 20px;
-  right: 100px;
-  display: flex;
-  padding: 30px;
-  width: 150px;
-  height: 50px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-.box {
-  width: 100%;
-  height: 100%;
+body{
+  margin: 0;
+  padding: 0;
 }
 </style>
