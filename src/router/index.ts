@@ -4,8 +4,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'weIndex',
-      component: () => import('../views/weIndex.vue')
+      name: 'index',
+      component: () => import('../views/indexPage.vue')
     },
     {
       path: '/vr',

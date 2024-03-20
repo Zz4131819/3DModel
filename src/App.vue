@@ -1,7 +1,5 @@
 <template>
-  <div>
-      <RouterView/>
-  </div>
+  <RouterView/>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
