@@ -55,7 +55,7 @@ const scene = new THREE.Scene()
 // const mesh = new URL(`@/assets/SwingDancing.fbx`, import.meta.url).href
 // const mesh = new URL(`@/assets/home.glb`, import.meta.url).href
 
-const mesh = 'http://127.0.0.1:8080/file/12.glb'
+const mesh = 'http://127.0.0.1:8080/file/home.glb'
 // const bg = new URL(`@/assets/bg.jpg`, import.meta.url).href
 // 动画数组
 const actions = [];
@@ -213,8 +213,8 @@ onMounted(()=>{
     camera.value = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
     camera.value.position.set(10,10,10); // 设置相机位置
     camera.value.lookAt(new THREE.Vector3(0, 0, 0));
-    getImgesListData()
-    // gltfloading(mesh,camera,renderer)
+    // getImgesListData()
+    gltfloading(mesh,camera,renderer)
     // 在计算属性中使用 data.imges[0] 来确保异步数据已经加载完毕
 })
   
