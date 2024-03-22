@@ -5,7 +5,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/topPage.vue')
+      component: () => import('../views/sectionContainer.vue')
     }
   ]
 })

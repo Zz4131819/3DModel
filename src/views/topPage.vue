@@ -135,9 +135,9 @@ onMounted(()=>{
 </script>
 <style lang="scss" scoped>
   .box{
-    margin:40px; 
-    width: calc(100% - 80px);
-    height:500px;
+    margin:40px 0 0 0; 
+    width: 100%;
+    height:calc(100vh - 64px);
     display: flex;
     .upload-container{
       width: 45%;

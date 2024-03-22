@@ -162,12 +162,12 @@ onMounted(()=>{
             margin: auto;
         }
     }
-  .globe-container{
-    margin:40px; 
-    width: calc(100% - 80px);
-    height:100%;
-  }
-   
-    
+    .globe-container{
+        margin:40px; 
+        width: calc(100% - 80px);
+        height:100%;
+    }
+
+
 </style>
   
