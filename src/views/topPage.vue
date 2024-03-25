@@ -26,10 +26,10 @@
       </div>
     </div>
     <div class="canvas-container">
-      <canvas id="topCanvas" style="width: 650px;height: 500px;"></canvas>
+      <canvas id="topCanvas" style="width: 400px;height: 400px;"></canvas>
     </div>
   </div>
-  <centerPage/>
+
 </template>
 <script setup>
 import * as THREE from 'three';
@@ -37,7 +37,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { onMounted, reactive, ref } from 'vue';
 import { getImgesList } from '../api/index'
 import { ElLoading } from 'element-plus';
-import centerPage from './centerPage.vue'
+
 const dialogImageUrl = ref()
 const dialogVisible = ref(false)
 const scene = new THREE.Scene()
@@ -87,8 +87,6 @@ const sphericalGeometry = (url) =>{
   animateFunction(0)
   hideLoading()
 }
-
-// 动画循环
 const animateFunction = (mixer) =>{
   function animate() {
       requestAnimationFrame(animate);
@@ -99,7 +97,6 @@ const animateFunction = (mixer) =>{
   }
   animate();
 }
-
 const data = reactive({
   imges:[]
 })
@@ -121,26 +118,27 @@ const camera = ref()
 onMounted(()=>{
   canvas.value = document.getElementById("topCanvas");
   renderer.value = new THREE.WebGLRenderer({ canvas: canvas.value ,preserveDrawingBuffer:true});
-  renderer.value.setSize(650, 500)
+  renderer.value.setSize(500, 400)
   renderer.value.setClearColor(0xffffff,0);
-  camera.value = new THREE.PerspectiveCamera(75, 650 / 500);
+  camera.value = new THREE.PerspectiveCamera(75, 500 / 400);
   camera.value.position.set(10,10,10); // 设置相机位置
-  camera.value.lookAt(new THREE.Vector3(0, 0, 0));
+  camera.value.lookAt(new THREE.Vector3(1, 1, 1));
   getImgesListData()
-  // gltfloading(mesh,camera,renderer)
-  // 在计算属性中使用 data.imges[0] 来确保异步数据已经加载完毕
 })
-
-
 </script>
 <style lang="scss" scoped>
   .box{
     margin:40px 0 0 0; 
     width: 100%;
-    height:calc(100vh - 64px);
+    height:100%;
     display: flex;
+    background-image: url('../assets/images/pexels2.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     .upload-container{
       width: 45%;
+      padding: 20px;
       .title-container{
         width: 100%;
         height: 40%;
@@ -159,11 +157,9 @@ onMounted(()=>{
     }
     .canvas-container {
       overflow: hidden;
-      width: 650px;
-      height: 500px;
-      margin: auto;
+      padding: 8%;
+      width: 55%;
+      height: 350px;
     }
   }
-  
-  
 </style>

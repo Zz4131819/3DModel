@@ -153,7 +153,7 @@ onMounted(()=>{
     .box{
         margin:40px; 
         width: calc(100% - 80px);
-        height:500px;
+        height:100%;
         display: flex;
         .canvas-container {
             overflow: hidden;
