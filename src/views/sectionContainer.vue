@@ -2,17 +2,20 @@
     <div class="container" ref="scrollContainer" @scroll="handleScroll">
         <div class="item">
             <TopPage />
-            <div class="animated-element">
+            <div class="animated-element" @click="nextContainer">
                 <img src="@/assets/images/arrow-down.png" >
             </div>
         </div>
         <div class="item">
             <centerPage />
-            <div class="animated-element">
+            <div class="animated-element" @click="nextContainer">
                 <img src="@/assets/images/arrow-down.png" >
             </div>
         </div> 
         <div class="item">
+            <div class="animated-element" @click="nextContainer">
+                <img src="@/assets/images/arrow-down.png" >
+            </div>
         </div>
     </div>
 </template>
@@ -20,7 +23,25 @@
 <script setup>
 import TopPage from './topPage.vue'
 import centerPage from './centerPage.vue'
-
+import { ref } from 'vue'
+const scrollContainer = ref()
+const nextContainer = () =>{
+    console.log('next')
+    const container = scrollContainer.value
+    if (container) {
+        const scrollHeight = container.scrollHeight
+        const currentScrollTop = container.scrollTop
+        const itemHeight = container.clientHeight
+        let targetScrollTop = currentScrollTop + itemHeight
+        if (targetScrollTop + itemHeight > scrollHeight) {
+            targetScrollTop = 0
+        }
+        container.scrollTo({
+            top: targetScrollTop,
+            behavior: 'smooth'
+        })
+    }
+}
 </script>
   
 <style lang="scss" scoped>
@@ -33,7 +54,6 @@ import centerPage from './centerPage.vue'
 .item {
     scroll-snap-align: center;
     height: 100%;
- 
 }
   
   

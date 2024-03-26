@@ -38,7 +38,6 @@ const stuts = reactive({
 })
 const sphericalGeometry = (url) =>{
   showLoading()
-  // 鼠标操作旋转、缩放
   const controls = new OrbitControls(camera.value, renderer.value.domElement);
   controls.enableZoom = true;
   controls.enablePan = false;
@@ -58,32 +57,25 @@ const sphericalGeometry = (url) =>{
 }
 //场景
 const scene = new THREE.Scene()
-//人物模型
-const mesh = 'http://127.0.0.1:8080/file/home.glb'
+const mesh = new URL(`@/assets/model/earth.glb`, import.meta.url).href
 
 const gltfloading = (mesh) =>{
     gltfLoader.load(mesh, (gltf) => {
         const model = gltf.scene;
-        // // 将模型居中显示
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center); // 将模型移动到原点
-        // 计算模型适合屏幕大小的缩放比例
+        model.position.sub(center);
         const maxSize = Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-        const targetSize = 11; // 设置模型期望的大小
+        const targetSize = 5;
         const scale = targetSize / maxSize;
         model.scale.set(scale, scale, scale);
-        // 添加模型到场景中
         scene.add(model);
         scene.add(new THREE.AmbientLight(0xffffff, 5))
-        // 鼠标操作旋转、缩放
         const controls = new OrbitControls(camera.value, renderer.value.domElement);
         controls.enablePan = false;
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
-        // 创建动画混合器
         const mixer = new THREE.AnimationMixer(model);
-        traversal (mixer,gltf)
         animateFunction(mixer,model)
     });
 }
@@ -106,13 +98,7 @@ const generated = () =>{
     const particles = new THREE.Points(geometry, material);
     scene.add(particles);
 }
- 
-const traversal = (mixer,gltf) =>{
-    gltf.animations.forEach((clip) => {
-        const action = mixer.clipAction(clip);
-        stuts.actions.push(action);
-    });
-}
+
 
 // 动画循环
 const animateFunction = (mixer,model) =>{
@@ -137,12 +123,11 @@ const camera = ref()
 onMounted(()=>{
     canvas.value = document.getElementById("centerCanvas");
     renderer.value = new THREE.WebGLRenderer({ canvas: canvas.value ,preserveDrawingBuffer:true});
-    renderer.value.setSize(sizes.width, 500)
+    renderer.value.setSize(600, 500)
     renderer.value.setClearColor(0xffffff,0);
-    camera.value = new THREE.PerspectiveCamera(75, sizes.width / 500);
+    camera.value = new THREE.PerspectiveCamera(75, 600 / 500);
     camera.value.position.set(10,10,10); // 设置相机位置
     camera.value.lookAt(new THREE.Vector3(0, 0, 0));
-    // getImgesListData()
     gltfloading(mesh)
     generated()
 })
@@ -151,13 +136,16 @@ onMounted(()=>{
 </script>
 <style lang="scss" scoped>
     .box{
-        margin:40px; 
-        width: calc(100% - 80px);
+        width: 100%;
         height:100%;
         display: flex;
+        background-image: url('../assets/images/pexels3.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
         .canvas-container {
             overflow: hidden;
-            width: 100%;
+            width: 600px;
             height: 500px;
             margin: auto;
         }
