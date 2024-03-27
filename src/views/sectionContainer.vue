@@ -13,6 +13,7 @@
             </div>
         </div> 
         <div class="item">
+            <BottomPage/>
             <div class="animated-element" @click="nextContainer">
                 <img src="@/assets/images/arrow-down.png" >
             </div>
@@ -22,7 +23,8 @@
   
 <script setup>
 import TopPage from './topPage.vue'
-import centerPage from './centerPage.vue'
+import CenterPage from './centerPage.vue'
+import BottomPage from './bottomPage.vue'
 import { ref } from 'vue'
 const scrollContainer = ref()
 const nextContainer = () =>{

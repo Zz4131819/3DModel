@@ -38,6 +38,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { getImgesList } from '../api/index'
 import { ElLoading } from 'element-plus';
 
+const image = new URL(`@/assets/model/Sunset.jpg`, import.meta.url).href
 const dialogImageUrl = ref()
 const dialogVisible = ref(false)
 const scene = new THREE.Scene()
@@ -123,7 +124,8 @@ onMounted(()=>{
   camera.value = new THREE.PerspectiveCamera(75, 500 / 400);
   camera.value.position.set(10,10,10); // 设置相机位置
   camera.value.lookAt(new THREE.Vector3(1, 1, 1));
-  getImgesListData()
+  // getImgesListData()
+  sphericalGeometry(image)
 })
 </script>
 <style lang="scss" scoped>
