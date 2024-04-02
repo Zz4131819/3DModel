@@ -32,12 +32,11 @@
         </div>
       </div>
       <div class="canvas-container">
-        <canvas id="bottomCanvas" style="width: 400px;height: 400px;"></canvas>
+        <canvas id="bottomCanvas"></canvas>
       </div>
     </div>
-  
-  </template>
-  <script setup>
+</template>
+<script setup>
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
   import { onMounted, ref } from 'vue';
@@ -45,44 +44,39 @@
   import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
   import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
   const scene = new THREE.Scene()
-
-  const gltfLoader = new GLTFLoader()
-  const fbxLoader = new FBXLoader()
-  const objLoader = new OBJLoader()
-
+  // const gltfLoader = new GLTFLoader()
+  // const fbxLoader = new FBXLoader()
+  // const objLoader = new OBJLoader()
+  const fileLoader = {
+    'gltf': new GLTFLoader(),
+    'fbx': new FBXLoader(),
+    'obj': new OBJLoader(),
+    'glb': new GLTFLoader()
+  }
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+}
   const fileList = ref([])
   const onExceed = (files) =>{
     fileList.value = files
-    const suffix = files[0].name
+    const suffix = files[0].name.split('.').pop()
     const url = URL.createObjectURL(files[0]);
-    judgment(suffix,url)
+    fielLoading(suffix,url)
   }
   const fileProgress = (rawFile) =>{
     const suffix = rawFile.name.split('.').pop();
     const url = URL.createObjectURL(rawFile.raw);
-    judgment(suffix,url)
+    fielLoading(suffix,url)
   } 
-  const judgment = (suffix,url) =>{
-    scene.traverse(child => {
-      // console.log(child instanceof THREE.Mesh)
-      if (child instanceof THREE.Mesh) {
-        console.log('Mesh',child instanceof THREE.Mesh)
-        scene.remove(child)
-      }
-      scene.remove(child)
-    });
-    if (suffix == 'obj') {
-        objLoading(url)
-    } else if(suffix == 'glb' || suffix == 'gltf') {
-        gltfLoading(url)
-    } else if (suffix == 'fbx'){
-        fbxLoading(url)
-    }   
-  }
-
-  const gltfLoading = (mesh) => {
-    gltfLoader.load(mesh, (gltf) => {
-        const model = gltf.scene;
+  let model = null
+  const fielLoading = (type, url) =>{
+    clearModel()
+    return new Promise((resolve, reject) => {
+      let loader = fileLoader[type]
+      console.log(loader)
+      loader.load(url, (result)=>{
+        model = result.scene
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
@@ -90,68 +84,20 @@
         const targetSize = 5;
         const scale = targetSize / maxSize;
         model.scale.set(scale, scale, scale);
-        scene.add(model);
-        scene.add(new THREE.AmbientLight(0xffffff, 5))
-        const controls = new OrbitControls(camera.value, renderer.value.domElement);
-        controls.enablePan = false;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
+        scene.add(model)
         const mixer = new THREE.AnimationMixer(model);
         animateFunction(mixer)
-    });
-  }
-  const fbxLoading = (mesh) => {
-    fbxLoader.load(mesh,(fbx) => {
-        const model = fbx.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center);
-        const maxSize = Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-        const targetSize = 5;
-        const scale = targetSize / maxSize;
-        model.scale.set(scale, scale, scale);
-        scene.add(model);
-        scene.add(new THREE.AmbientLight(0xffffff, 5))
-        const controls = new OrbitControls(camera.value, renderer.value.domElement);
-        controls.enablePan = false;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        const mixer = new THREE.AnimationMixer(model);
-        animateFunction(mixer)
+      })
     })
   }
-  const objLoading = (mesh) => {
-    console.log(mesh)
-    let blobURL = URL.createObjectURL(mesh);
-    objLoader.load(blobURL,(obj) => {
-        console.log(obj)
-        const model = obj.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center);
-        const maxSize = Math.max(box.getSize(new THREE.Vector3()).x, box.getSize(new THREE.Vector3()).y, box.getSize(new THREE.Vector3()).z);
-        const targetSize = 5;
-        const scale = targetSize / maxSize;
-        model.scale.set(scale, scale, scale);
-        scene.add(model);
-        scene.add(new THREE.AmbientLight(0xffffff, 5))
-        const controls = new OrbitControls(camera.value, renderer.value.domElement);
-        controls.enablePan = false;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.25;
-        const mixer = new THREE.AnimationMixer(model);
-        animateFunction(mixer)
-    })
-  }
-  const animateFunction = (mixer) =>{
-    function animate() {
-        requestAnimationFrame(animate);
-        if(mixer){
-            mixer.update(0.01);
-        }
-        renderer.value.render(scene, camera.value);
-    }
-    animate();
+  const clearModel = () =>{
+    scene.traverse((v) => {
+			if (v.type === 'Mesh') {
+				v.geometry.dispose();
+				v.material.dispose();
+			}
+      scene.remove(model)
+		})
   }
   const canvas = ref()
   const renderer = ref()
@@ -159,11 +105,16 @@
   onMounted(()=>{
     canvas.value = document.getElementById("bottomCanvas");
     renderer.value = new THREE.WebGLRenderer({ canvas: canvas.value ,preserveDrawingBuffer:true});
-    renderer.value.setSize(500, 400)
+    renderer.value.setSize(sizes.width/2, sizes.height/2)
     renderer.value.setClearColor(0xffffff,0);
     camera.value = new THREE.PerspectiveCamera(75, 500 / 400);
     camera.value.position.set(10,10,10); // 设置相机位置
     camera.value.lookAt(new THREE.Vector3(1, 1, 1));
+    scene.add(new THREE.AmbientLight(0xffffff, 5))
+    const controls = new OrbitControls(camera.value, renderer.value.domElement);
+    controls.enablePan = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
   })
   </script>
   <style lang="scss" scoped>

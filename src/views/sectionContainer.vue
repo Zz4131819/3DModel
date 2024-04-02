@@ -28,7 +28,6 @@ import BottomPage from './bottomPage.vue'
 import { ref } from 'vue'
 const scrollContainer = ref()
 const nextContainer = () =>{
-    console.log('next')
     const container = scrollContainer.value
     if (container) {
         const scrollHeight = container.scrollHeight
